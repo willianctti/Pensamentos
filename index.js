@@ -6,6 +6,15 @@ const FileStore = require('session-file-store')(session)
 const flash = require('express-flash')
 const conn = require('./db/conn')
 
+// Models
+const Pensamento = require('./models/Pensamento')
+const User = require('./models/User')
+
+// Routes 
+const pensamentosRoutes = require('./routes/pensamentosRoutes')
+const PensamentoController = require('./controllers/PensamentoController')
+
+
 const app = express()
 
 // Template Engine
@@ -19,7 +28,7 @@ app.use(
     })
 )
 
-app.use(express.json)
+app.use(express.json())
 
 // Session Middleware
 app.use(
@@ -54,6 +63,11 @@ app.use((req, res, next) => {
     }
     next()
 })
+
+// Routes
+app.use("/pensamentos", pensamentosRoutes)
+app.get("/", PensamentoController.showPensamentos)
+
 
 conn
     .sync()

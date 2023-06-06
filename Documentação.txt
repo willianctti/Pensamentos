@@ -101,3 +101,114 @@ app.use((req, res, next) => {
 })
 
 -------------------------------------------------------------
+
+
+
+
+
+
+
+
+			Models --------------------------------------
+
+
+
+Comecei pelo model de pensamento pois é o mais simples:
+
+const { DataTypes } = require('sequelize')
+const db = require('../db/conn')
+
+// User
+
+const Pensamento = db.define('Pensamento', {
+    title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        require: true
+    }
+})
+
+module.exports = Pensamento
+
+
+
+
+
+e o model User:
+
+const { DataTypes } = require('sequelize')
+const db = require('../db/conn')
+
+const User = db.define('User', {
+    name: {
+        type: DataTypes.STRING,
+        require: true
+    },
+    email: {
+        type: DataTypes.STRING,
+        require: true
+    },
+    senha: {
+        type: DataTypes.STRING,
+        require: true
+    },
+})
+
+module.exports = User
+
+
+
+Relacionamento entre User e pensamento:
+
+const User = require('./User')
+Pensamento.belongsTo(User)
+User.hasMany()
+
+
+
+
+
+
+
+
+
+
+		Criando a home do projeto ---------------------------------
+
+No nosso main fiz um body simples. Uma nav com a logo principal, ul e li
+de Login; Register e um footer básico
+
+
+
+		Rotas e controller -----------------------------------------
+
+Iniciei as rotas com o arquivo pensamentosRoutes.js
+importei o express, router e nosso controller
+
+inciei a rota home com
+router.get('/', PensamentoController.showPensamentos)
+
+
+
+
+
+no Controller importei o model Pensamento e o User
+
+criei o que liga a rota home:
+
+module.exports = class PensamentosController {
+    static async showPensamentos(req, res) {
+        res.render('pensamentos/home')
+    }
+}
+
+
+
+
+no nosso index.js puxamos as rotas depois de a importar
+app.use('/pensamentos', pensamentosRoutes)
+
+e também para a rota /
+app.use('/', PensamentosController.showPensamentos)
+
+

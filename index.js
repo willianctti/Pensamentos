@@ -12,6 +12,8 @@ const User = require('./models/User')
 
 // Routes 
 const pensamentosRoutes = require('./routes/pensamentosRoutes')
+const authRoutes = require('./routes/authRoutes')
+
 const PensamentoController = require('./controllers/PensamentoController')
 
 
@@ -66,6 +68,9 @@ app.use((req, res, next) => {
 
 // Routes
 app.use("/pensamentos", pensamentosRoutes)
+app.use("/", authRoutes)
+
+
 app.get("/", PensamentoController.showPensamentos)
 
 

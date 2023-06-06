@@ -212,3 +212,90 @@ e também para a rota /
 app.use('/', PensamentosController.showPensamentos)
 
 
+
+
+
+			Iniciando autenticação -----------------------------
+
+primeiramente criei uma nova rota de autenticação e um novo controller:
+
+controller:
+
+
+module.exports = class AuthController {
+    static  login(req, res) {
+        res.render('auth/login')
+    }
+
+    static  register(req, res) {
+        res.render('auth/register')
+    }
+    
+}
+
+e nossa rota:
+
+const express = require('express')
+const router = express.Router()
+
+const AuthController = require('../controllers/AuthController')
+
+router.get('/login', AuthController.login)
+router.get('/register', AuthController.register)
+
+
+module.exports = router
+
+
+
+e no nosso index importamos a nossa rota e damos um app.use na / 
+app.use("/", authRoutes)
+
+
+
+
+
+fiz a pagina de register  com um form e 
+
+
+
+
+
+
+
+
+		Implemetnando flash messages---------------------------------
+
+
+primeiro pego o post que vem do form do register numa rota:
+router.post('/register', AuthController.registerPost)
+
+
+
+
+no controller, primeiramente importamos o model user e o bcrypt para
+criptografar a senha do nosso usuário
+
+
+criamos nosa static
+ static async registerPost(req, res) {
+        
+    }
+
+e agora vamos começar a fazer as validações
+
+
+const User = require('../models/User')
+const bcrypt = require('bcryptjs')
+
+ static async registerPost(req, res) {
+        const {name, email, password, confirmpassword} = req.body
+
+        // password match validation
+        if(password != confirmpassword) {
+            req.flash('message', 'As senhas não coincidem')
+            res.render('auth/register')
+
+            return
+        }
+    }

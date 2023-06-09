@@ -438,3 +438,154 @@ primeiro, criamos o form de login
 
     <form action="/login" method="POST">
 
+na nossa rota
+router.post('/login', AuthController.loginPost)
+
+
+e no nosso controller
+
+   const {email, password} = req.body
+
+        //find user
+        const user = await User.findOne({where: {email: email}})
+        if(!user) {
+            req.flash('message', 'Usuário não encontrado')
+            res.render('auth/login')
+            return
+        }
+
+
+        // check password match
+        const passwordMatch = bcrypt.compareSync(password, user.password)
+
+        if(!passwordMatch) {
+            req.flash('message', 'Senha incorreta')
+            res.render('auth/login')
+            return
+        }
+
+
+        // If user exists and password match
+
+        
+            // Initialize session
+            req.session.userid = user.id
+            req.session.save(() => {
+                res.redirect('/')
+            })
+
+
+
+
+
+
+
+
+
+
+
+Middleware de verificação de autenticação e dashboard ------------------
+
+em nossas rotas
+ router.get('/dashboard', PensamentoController.dashboard)
+
+static async dashboard(req, res) {
+        res.render('pensamentos/dashboard')
+    } 
+
+e criamos a view der dashboard
+
+
+mas podemos facilmente acessar essa rota sem estar logado. Para barrar isso
+iremos ter que utilizar um middleware
+
+
+para isso, criamos uma nova pasta chamada helpers
+criamos um arquivo com o nome auth.js, por exemplo
+e fazemos a verificação:
+
+module.exports.checkAuth = function(req, res, next) {
+    const userId = req.session.userid
+
+    if(!userId) {
+       return res.redirect('/login')
+    }
+
+    next()
+}
+
+agr o importamos no nosso routes
+ // Helpers
+
+ const checkAuth = require('../helpers/auth').checkAuth
+
+e o usamos na nossa rota:
+ router.get('/dashboard', checkAuth, PensamentoController.dashboard)
+
+
+
+
+
+
+		criando formulário de pensamento ---------------------------
+
+fazemos nossa nova view create e fazemos o css
+
+agora vamos fazer o post para add nossos pensamentos
+
+ router.post('/add', checkAuth, PensamentoController.createPensamentoSave)
+
+
+ static async createPensamentoSave(req, res) {
+        const pensamento =  {
+            title: req.body.title,
+            UserId: req.session.userid
+
+        }
+
+        try {
+            await Pensamento.create(pensamento)
+            req.flash('message', 'Pensamento criado com sucesso!')
+
+            req.session.save(() => {
+                res.redirect('/pensamentos/dashboard')
+           })
+
+        } catch(error) {
+            console.log(error)
+        }
+    }
+
+
+
+
+
+
+			Resgatando pensamentos para a dashboard ---------
+
+	
+   static async dashboard(req, res) {
+        const userId = req.session.userid
+        const user = await User.findOne({
+            where: {
+                id: userId,
+            },
+            include: Pensamento, 
+            plain: true,
+        })
+
+        if(!user) {
+            res.redirect('/login')
+        }
+        const pensamentos = user.Pensamentos.map((result) => result.dataValues)
+
+
+
+
+        res.render('pensamentos/dashboard', { pensamentos})
+
+
+    }
+
+
+        {{#each pensamentos}}

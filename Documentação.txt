@@ -1,3 +1,11 @@
+Neste projeto eu utlizei o MVC, Express, PageReloading, Session, Validações,
+Express, MySql, CRUD, Busca e ordenação.
+	
+
+
+
+
+	
 Todas as dependências desse projeto:
 
 bcryptjs, connect-flash, cookie-parser, cookie-session, express, express-flash, 
@@ -589,3 +597,137 @@ agora vamos fazer o post para add nossos pensamentos
 
 
         {{#each pensamentos}}
+
+
+
+
+
+
+		Removendo pensamentos -------------------------------------
+
+
+primeiro criamos a rota de remover
+ router.post('/remove', checkAuth, PensamentoController.removePensamento)
+
+
+e no nosso controller:
+static async removePensamento(req, res) {
+        const id = req.body.id
+        const UserId = req.session.userid
+
+        try {
+            await Pensamento.destroy({where: {id: id, UserId: UserId}})
+            req.flash('message', 'Pensamento removido com sucesso!')
+
+            req.session.save(() => {
+                res.redirect('/pensamentos/dashboard')
+            })
+        } catch(error) {
+            console.log(error)
+        }
+    }
+
+
+
+
+
+		Preenchendo form de edição com dados do Pensamento -------
+
+ router.get('/edit/:id', checkAuth, PensamentoController.updatePensamento)
+
+
+ static async updatePensamento(req, res) {
+        const id = req.params.id
+
+        const pensamento = await Pensamento.findOne({where: {id: id}})
+
+        res.render('pensamentos/edit', { pensamento})
+    }
+}
+
+
+agora vamos fazer o processamento do post do form
+
+ router.post('/edit', checkAuth, PensamentoController.updatePensamentoSave)
+
+        const id = req.body.id
+        const pensamento  = {
+            title: req.body.title
+        }
+
+        try {
+            await Pensamento.update(pensamento, {where: {id: id}})
+            req.flash('message', 'Pensamento alterado com sucesso!')
+    
+            req.session.save(() => {
+                res.redirect('/pensamentos/dashboard')
+            })
+        } catch(error) {
+            console.log(error)
+        }
+    }
+
+
+			Resgatando dados da home -------------------
+
+
+ static async showPensamentos(req, res) {
+        const pensamentosData = await Pensamento.findAll({
+            include: User,
+        })
+        const pensamentos = pensamentosData.map((result) => result.get({plain: true}))
+
+
+
+        res.render('pensamentos/home', {pensamentos})
+    }
+
+
+
+
+
+
+
+			Criando funcionalidade de busca
+
+	
+const { Op} = require('sequelize')
+
+module.exports = class PensamentoController {
+    static async showPensamentos(req, res) {
+        let search = ''
+        if(req.query.search) {
+            search = req.query.search
+        }
+
+        const pensamentosData = await Pensamento.findAll({
+            include: User,
+            where: {
+                title: {[Op.like]: `%${search}%`},
+            }
+        })
+
+
+  <h1>Você está buscando por: <span>{{search}}</span></h1>
+        {{#if pensamentosQty }}
+            <p>Foram encontrados <span>{{pensamentosQty}}</span> pensamento(s)</p>
+        {{else}}
+            <p>Nenhum pensamento encontrado para o termo <span>{{search}}</span></p>
+        {{/if}}
+    {{else}}
+    <h1>Conheça alguns dos nossos <span>Pensamentos</span>:</h1>
+    {{/if}}
+    <form action="/" method="GET">
+        <input type="text" name="search" placeholder="Está buscando por algo?">
+        <input type="submit" class="btn" value="Buscar">
+    </form>
+
+
+
+
+        let order = 'DESC'
+        if(req.query.order === 'old') {
+            order = 'ASC'
+        } else {
+            order = 'DESC'
+        }

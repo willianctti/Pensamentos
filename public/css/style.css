@@ -165,21 +165,21 @@
   }
   
   /* CREATE / EDIT FORM */
-  .tought-form-container a {
+  .pensamento-form-container a {
     color: #f6982d;
   }
   
-  .tought-form-container a:hover {
+  .pensamentos-form-container a:hover {
     color: #fff;
   }
   
-  .tought-form-container h1 {
+  .pensamentos-form-container h1 {
     border-left: 4px solid #f6982d;
     padding: 10px;
     margin-top: 1em;
   }
   
-  .tought-form-container form {
+  .pensamentos-form-container form {
     max-width: 30%;
     margin-top: 1.5em;
   }
@@ -262,20 +262,20 @@
     color: #f6982d;
   }
   
-  .toughts-container figure {
+  .pensamentos-container figure {
     border-bottom: 1px solid #333;
     padding: 0.5em;
     max-width: 50%;
     margin: 0 auto 1em;
   }
   
-  .toughts-container blockquote {
+  .pensamentos-container blockquote {
     font-style: italic;
     font-size: 2em;
     margin-bottom: 0.4em;
   }
   
-  .toughts-container span {
+  .pensamentos-container span {
     color: #f6982d;
   }
   
